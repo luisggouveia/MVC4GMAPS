@@ -1,0 +1,561 @@
+﻿@model IEnumerable<MVC4GMAPS.Models.Coordinate>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@if (Model.ElementAt(0).Lat==10)
+{
+    <h4> </h4>
+    <h4>Please click on Locations and insert the cities you're planning to connect</h4>
+}
+else
+{
+    if (Model.ElementAt(0).PostUser!=null)
+    {
+        <h4> </h4>
+        <h4> @Model.ElementAt(0).PostUser's trips</h4>
+    }
+    
+    //SHOW OPTIONS
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.2.js"></script>
+    <link rel="stylesheet" type="text/css" href="~/content/Site.css">
+    
+	<script>
+    $(document).ready(function() {
+        $('.nav-toggle').click(function(){
+            //get collapse content selector
+            var collapse_content_selector = $(this).attr('href');
+
+            //make the collapse content to be shown or hide
+            var toggle_switch = $(this);
+
+            if (collapse_content_selector=="#collapse1") {
+                $('#collapse1').slideToggle();
+                if (_ShowWeather)
+                {
+                    toggle_switch.html('Show Weather Forecast');
+                    _ShowWeather=false;
+                }
+                else
+                {
+                    toggle_switch.html('Hide Weather Forecast');
+                    _ShowWeather=true;
+                }
+            }
+
+            if (collapse_content_selector=="#collapse2") {
+                if (_RouteInfoShown)
+                {
+                    toggle_switch.html('Show Route Info');
+                    window._RouteInfoShown=false;
+                }
+                else
+                {
+                    toggle_switch.html('Hide Route Info');
+                    window._RouteInfoShown=true;
+                }
+
+                if (window._avoidtolls==true)
+                    $('#collapse2plus').slideToggle();
+                else
+                    $('#collapse2').slideToggle();
+            }
+            if (collapse_content_selector=="#collapse3") {
+                if (window._RouteInfoShown) {
+                    $('#collapse2plus').toggle();
+                    $('#collapse2').toggle();
+                }
+
+                if (_avoidtolls)
+                {
+                    toggle_switch.html('Including Tolls');
+                    window._avoidtolls=false;
+                }
+                else
+                {
+                    toggle_switch.html('Avoiding Tolls');
+                    window._avoidtolls=true;
+                }
+
+                window._modified=true;
+
+                window._map = new google.maps.Map(document.getElementById("map_canvas"), {
+                    mapTypeId: 'roadmap',
+                });
+
+                var Lats = [];
+                var Lons= [];
+                var lat;
+                var lon;
+                var Coords=[];
+                var Coordinat = @Html.Raw(Json.Encode(Model));
+                var SIZE = @Model.Count();
+                var j=0;
+                var n_routes=1;
+
+                for (var h = 0; h < SIZE; h++)
+                {
+                    if (h>0)
+                    {
+                        if ((Coordinat[h-1].Trip) != (Coordinat[h].Trip))
+                        {
+                            n_routes++;
+                        }
+                    }
+                }
+                for (var i = 0; i < SIZE; i++)
+                {
+                    lat=Coordinat[i].Lat;
+                    lon=Coordinat[i].Lon;
+                    Lats.push({location:lat, stopover:true});
+                    Lons.push({location:lon, stopover:true});
+                    Coords[j]=new google.maps.LatLng(lat, lon);
+                    window._coords[j]=new google.maps.LatLng(lat, lon);///
+                    if (i==(SIZE-1))
+                    {
+                        calculateWaypointRoute2(window._coords, window._map);
+                    }
+                    else
+                    {
+                        if (Coordinat[i].Trip != Coordinat[i+1].Trip)
+                        {
+                            calculateWaypointRoute2(window._coords, window._map);
+                            Coords=[];
+                            Coords.length=0;
+                            j=-1;
+                        }
+                    }
+                    j++;
+                }
+            }
+        });
+    });
+    </script>
+    
+    <p></p>
+    <div>
+		<button href="#collapse1" class="nav-toggle button3">Show Weather Forecast</button>
+	
+		<button href="#collapse2" class="nav-toggle button3">Show Route Info</button>
+
+        <button href="#collapse3" class="nav-toggle button3">Including Tolls</button>
+	</div>
+
+    <div id="collapse3" style="display:none">
+    </div>
+    
+    //SHOW WEATHER FORECAST
+    <div id="collapse1" style="display:none">
+
+        @{
+        int mycounter=0;
+        foreach (var i in Model)
+        {
+            var count = 0;
+
+            if (mycounter==0){
+                <p style="margin-bottom:5px"></p>
+                mycounter++;}
+            else{                               
+                <p style="margin-bottom:15px"></p>
+            }
+
+            if (i.State == null)
+            {
+                i.State = i.City;
+            }
+            
+            <text> <strong>::: @i.City, @i.State, @i.Country :::</strong> </text> <!--LGMG_DB_MODIF_14_02_25-->
+            <p style="margin-bottom:0px"></p>
+
+            foreach (var h in i.Weather)
+            {
+                if (count < 8)
+                {
+                //for (count=0;count<2;count++)
+                //{
+                    //<text> <strong>:::</strong> @day: @h with @i.Wind.ElementAt(@count) (Max:@i.MaxTemp.ElementAt(@count)° Min: @i.MinTemp.ElementAt(@count)° Hmd: @i.Humidity.ElementAt(@count)%) </text>
+                    <div id="MyDiv">
+
+                        @if ((i.Symbol.ElementAt(@count) == 0) || (i.Symbol.ElementAt(@count) >= 900)){
+                            <img src="~/Content/Images/9 - interrogation.jpg">}
+
+                        @if ((i.Symbol.ElementAt(@count) >= 200) && (i.Symbol.ElementAt(@count) < 300)){
+                            <img src="~/Content/Images/8 - storm.jpg">}
+  
+                        @if (i.Symbol.ElementAt(@count) == 800){
+                            <img src="~/Content/Images/1 - sunny.jpg">}
+
+                        @if ((i.Symbol.ElementAt(@count) == 801) || (i.Symbol.ElementAt(@count) == 802)){
+                            <img src="~/Content/Images/2 - sunny and cloudy.jpg">}
+
+                        @if (i.Symbol.ElementAt(@count) == 803){
+                            <img src="~/Content/Images/3 - cloudy.jpg">}
+
+                        @if (i.Symbol.ElementAt(@count) == 804){
+                            <img src="~/Content/Images/4 - dark clouds.jpg">}
+
+                        @if ((i.Symbol.ElementAt(@count) >= 600) && (i.Symbol.ElementAt(@count) < 700)){
+                            <img src="~/Content/Images/7 - snow.jpg">}
+
+                        @if ((i.Symbol.ElementAt(@count) == 302) || (i.Symbol.ElementAt(@count) == 312) || (i.Symbol.ElementAt(@count) == 504 || (i.Symbol.ElementAt(@count) == 521) || (i.Symbol.ElementAt(@count) == 522))){
+                            <img src="~/Content/Images/6 - rain.jpg">}
+                        else if ((i.Symbol.ElementAt(@count) >= 300) && (i.Symbol.ElementAt(@count) < 600)){
+                              <img src="~/Content/Images/5 - sunny with rain.jpg">}
+
+                    </div>
+                    <div id="MyDiv2">
+                        <strong><small>@DateTime.Now.AddDays(count).ToString("dd/MM/yy")</small></strong>
+                        <p style="margin-bottom:0px"></p>
+                        <text><small>Max: @i.MaxTemp.ElementAt(@count)°</small></text>
+                        <p style="margin-bottom:0px"></p>
+                        <text><small>Min: @i.MinTemp.ElementAt(@count)°</small></text>
+                    </div>
+                }
+                count++;
+            }
+        }
+        }
+    </div>
+
+     //SHOW DISTANCE & DURATION
+    <div id="collapse2" style="display:none">
+        @{
+            TripData ThisTripData = new TripData();
+            ThisTripData = GetDistanceAndTime(false);
+            <p></p>
+            <strong>Total:</strong> <span id="TOTALKM">@ThisTripData.TotalKm</span> <span> Km in </span> <span id="TOTALHOURS">@ThisTripData.TotalHours</span><span>:</span><span id="TOTALMINUTES">@ThisTripData.TotalMinutes.ToString("00")</span><span>h</span>
+            
+            for (int j = 0; j < @ThisTripData.MyCounter; j++)
+            {         
+                if (Model.ElementAt(j).Trip == Model.ElementAt(j + 1).Trip)
+                {
+                    <p></p>
+                    <strong> @Model.ElementAt(j).City.ToString()-@Model.ElementAt(j + 1).City.ToString():</strong> <span id="A@(j)">@ThisTripData.DistanceList.ElementAt(j)</span> <span> Km in </span> <span id="B@(j)">@ThisTripData.HoursList.ElementAt(j)</span><span>:</span><span id="C@(j)">@ThisTripData.MinutesList.ElementAt(j).ToString("00")</span><span> h </span>
+                }
+            }
+        }
+    </div>
+    
+    <div id="collapse2plus" style="display:none">
+        @{
+            TripData ThisTripData2 = new TripData();
+            ThisTripData2 = GetDistanceAndTime(true);
+            <p></p>
+            <strong>Total:</strong> <span id="TOTALKM">@ThisTripData2.TotalKm</span> <span> Km in </span> <span id="TOTALHOURS">@ThisTripData2.TotalHours</span><span>:</span><span id="TOTALMINUTES">@ThisTripData2.TotalMinutes.ToString("00")</span><span>h</span>
+            
+            for (int j = 0; j < @ThisTripData2.MyCounter; j++)
+            {         
+                if (Model.ElementAt(j).Trip == Model.ElementAt(j + 1).Trip)
+                {
+                    <p></p>
+                    <strong> @Model.ElementAt(j).City.ToString()-@Model.ElementAt(j + 1).City.ToString():</strong> <span id="A@(j)">@ThisTripData2.DistanceList.ElementAt(j)</span> <span> Km in </span> <span id="B@(j)">@ThisTripData2.HoursList.ElementAt(j)</span><span>:</span><span id="C@(j)">@ThisTripData2.MinutesList.ElementAt(j).ToString("00")</span><span> h </span>
+                }
+            }
+        }
+    </div>
+    
+    <p></p>
+}
+
+<script src="https://maps.google.com/maps/api/js?sensor=true" type="text/javascript"></script>
+
+<!-- This is the div that will contain the Google Map -->
+<div id="map_canvas" style="height: 500px;"></div>
+
+<!-- Enclose the Javascript in a "section" so that it is rendered in the correct order after scripts have been loaded etc -->
+@section scripts {
+    <section class="scripts">
+        <script type="text/javascript">
+
+            //<!-- This code tells the browser to execute the Initialize method only when the complete document model has been loaded -->
+            var _ShowWeather=false;
+            var _RouteInfoShown=false;
+            var _avoidtolls=false;
+            var _coords=[];
+            var _map;
+            var _modified=false;
+
+
+    $(document).ready(function () {
+
+        var directionsDisplay;
+        var Lats = [];
+        var Lons= [];
+        var lat;
+        var lon;
+        var Coords=[];
+        var Coordinat = @Html.Raw(Json.Encode(Model));
+        var SIZE = @Model.Count();
+        var j=0;
+        var n_routes=1;
+
+        //NOVO DAQUI
+        for (var h = 0; h < SIZE; h++)
+        {
+            if (h>0)
+            {
+                if ((Coordinat[h-1].Trip) != (Coordinat[h].Trip))
+                {
+                    n_routes++;
+                }
+            }
+        }
+        //alert(n_routes);   
+
+        var map = new google.maps.Map(document.getElementById("map_canvas"), {
+            mapTypeId: 'roadmap',
+        });
+        window._map = new google.maps.Map(document.getElementById("map_canvas"), {
+            mapTypeId: 'roadmap',
+        });
+
+        if (Coordinat[0].Lat!="10")
+        {
+            for (var i = 0; i < SIZE; i++)
+            {
+                lat=Coordinat[i].Lat;
+                lon=Coordinat[i].Lon;
+                Lats.push({location:lat, stopover:true});
+                Lons.push({location:lon, stopover:true});
+                Coords[j]=new google.maps.LatLng(lat, lon);
+                window._coords[j]=new google.maps.LatLng(lat, lon);///
+                if (i==(SIZE-1))
+                {
+                    calculateWaypointRoute2(window._coords, window._map);
+                }
+                else
+                {
+                    if (Coordinat[i].Trip != Coordinat[i+1].Trip)
+                    {
+                        calculateWaypointRoute2(window._coords, window._map);
+                        Coords=[];
+                        Coords.length=0;
+                        j=-1;
+                    }
+                }
+                j++;
+            }
+        }
+        else
+        {
+            google.maps.visualRefresh = true;
+
+            var map = new google.maps.Map(document.getElementById("map_canvas"), {
+                zoom: 4,
+                //center: new google.maps.LatLng(49.839683, 24.029717), //LVIV
+                center: new google.maps.LatLng(-22.912621,-43.230203), //RIO DE JANEIRO
+                mapTypeId: 'roadmap'
+            });
+
+            directionsDisplay = new google.maps.DirectionsRenderer();
+            directionsDisplay.setMap(map);
+            
+            //SOCHI FROM HERE
+            /*
+            var myLatlng = new google.maps.LatLng(43.585278, 39.720278);
+            var MyTitle="";
+            var infoWindowContent = '<div class="info_content">' +
+        '<h4>Sochi Winter Olympic Games</h4>' +
+        '<p>From 7/2 To 23/2</p>' +
+        '<p><a href="http://www.sochi2014.com/‎">Visit Sochi 2014 Website!</a></p>'
+        '</div>';
+        */
+            //TO HERE
+    
+            //MARATHON FROM HERE
+            /*
+        var myLatlng = new google.maps.LatLng(38.722252, -9.139337);
+        MyTitle = "Lisbon Half-Marathon!";
+        var infoWindowContent = '<div class="info_content">' +
+    '<h4><strong>Lisbon Half-Marathon</strong></h4>' +
+    '<p>16/3/2014</p>' +
+    '<p><a href="http://www.meiamaratonadelisboa.com/en">Visit Lisbon Half-Marathon Website!</a></p>'
+        '</div>';
+            */
+            //TO HERE
+
+            //WORLD CUP FROM HERE
+        var myLatlng = new google.maps.LatLng(-22.912621,-43.230203);
+        MyTitle = "World Cup 2014 Final!";
+        var infoWindowContent = '<div class="info_content">' +
+    '<h4><strong>World Cup 2014 Final</strong></h4>' +
+    '<p>13/7/2014 ::: Rio de Janeiro ::: Brazil</p>' +
+    '<p><a href="http://www.fifa.com/worldcup">Visit FIFA World Cup 2014 Website!</a></p>'
+        '</div>';
+            //TO HERE
+
+            var infoWindow = new google.maps.InfoWindow({
+                content: infoWindowContent
+            });
+
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+                animation: google.maps.Animation.DROP,
+                title: MyTitle,
+                infoWindow: infoWindow
+            });
+
+            google.maps.event.addListener(marker, 'click', function() {
+                infoWindow.open(map,marker);
+                toggleBounce(marker);
+            });
+
+            function toggleBounce(currentIcon) {
+                currentIcon.setAnimation(null);
+
+                if (currentIcon.getAnimation() != null) {
+                    currentIcon.setAnimation(null);
+                } else {
+                    currentIcon.setAnimation(google.maps.Animation.BOUNCE);
+                    setTimeout(function(){ currentIcon.setAnimation(null); }, 1400);
+                }
+            };
+
+            infoWindow.open(map, marker);
+        }
+    });
+
+    function calculateWaypointRoute2(MyCoordinates, map) {
+        var size = MyCoordinates.length;
+
+        var waypts = [];
+
+        if (size > 2)
+        {
+            for (var i = 0; i < (size-2); i++) {
+                waypts.push({ location: MyCoordinates[i+1], stopover: true });
+            }
+        }
+
+        var directionsService = new google.maps.DirectionsService();
+
+        if (size == 2) {
+            var directionsRequest = {
+                origin: MyCoordinates[0],
+                destination: MyCoordinates[size - 1],
+                provideRouteAlternatives: true,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC,
+                avoidTolls: window._avoidtolls
+            };
+        }
+        else
+        {
+            var directionsRequest = {
+                origin: MyCoordinates[0],
+                destination: MyCoordinates[size - 1],
+                waypoints: waypts,
+                provideRouteAlternatives: true,
+                travelMode: google.maps.DirectionsTravelMode.DRIVING,
+                unitSystem: google.maps.UnitSystem.METRIC,
+                avoidTolls: window._avoidtolls
+            };
+        }
+        
+        directionsService.route(
+            directionsRequest,
+            function (response, status) {
+                if (status == google.maps.DirectionsStatus.OK) {
+                    new google.maps.DirectionsRenderer({
+                        map: map,
+                        directions: response
+                    });
+                }
+                else
+                    $("#error").append("Unable to retrieve your route<br />");
+            }
+        );
+    }
+</script>
+</section>
+}
+
+<!--RAZOR FUNCTIONS-->
+@functions{
+    public TripData GetDistanceAndTime(bool avoidtoll)
+    {
+        TripData MyTripData = new TripData();
+        MyTripData.DistanceList = new List<double>();
+        MyTripData.HoursList = new List<int>();
+        MyTripData.MinutesList = new List<int>();
+
+        var counter = Model.Count();
+        double totaldistance = 0;
+        int totalduration = 0;
+        int totalminutes = 0;
+        int totalhours = 0;
+        int[] hours = new int[counter];
+        int[] minutes = new int[counter];
+        double[] distance = new double[counter];
+        string aux;
+        int MyCounter = 0;
+        for (int i = 0; i < counter - 1; i++)
+        {
+            //<p></p>
+            if (Model.ElementAt(i).Trip == Model.ElementAt(i + 1).Trip)
+            {
+                var DrivingDistanceLink = "";
+                if (avoidtoll == false)
+                {
+                    if (Model.ElementAt(i).State!=null)
+                        DrivingDistanceLink = "http://maps.googleapis.com/maps/api/distancematrix/xml?origins=" + Model.ElementAt(i).City.ToString() + "," + Model.ElementAt(i).State.ToString() + "," + Model.ElementAt(i).Country.ToString() + "&destinations=" + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).Country.ToString() + "&mode=driving&language=en-UK&sensor=false"; //<!--LGMG_DB_MODIF_14_02_25-->
+                    else
+                        DrivingDistanceLink = "http://maps.googleapis.com/maps/api/distancematrix/xml?origins=" + Model.ElementAt(i).City.ToString() + "," + Model.ElementAt(i).City.ToString() + "," + Model.ElementAt(i).Country.ToString() + "&destinations=" + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).Country.ToString() + "&mode=driving&language=en-UK&sensor=false"; //<!--LGMG_DB_MODIF_14_02_25-->
+                }
+                else
+                {
+                    if (Model.ElementAt(i).State != null)
+                        DrivingDistanceLink = "http://maps.googleapis.com/maps/api/distancematrix/xml?origins=" + Model.ElementAt(i).City.ToString() + "," + Model.ElementAt(i).State.ToString() + "," + Model.ElementAt(i).Country.ToString() + "&destinations=" + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).Country.ToString() + "&mode=driving&avoid=tolls&language=en-UK&sensor=false"; //<!--LGMG_DB_MODIF_14_02_25-->
+                    else
+                        DrivingDistanceLink = "http://maps.googleapis.com/maps/api/distancematrix/xml?origins=" + Model.ElementAt(i).City.ToString() + "," + Model.ElementAt(i).City.ToString() + "," + Model.ElementAt(i).Country.ToString() + "&destinations=" + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).City.ToString() + "," + Model.ElementAt(i + 1).Country.ToString() + "&mode=driving&avoid=tolls&language=en-UK&sensor=false"; //<!--LGMG_DB_MODIF_14_02_25-->   
+                }
+                System.Xml.XmlDocument MyXML = new System.Xml.XmlDocument();
+                MyXML.Load(DrivingDistanceLink);
+                System.Xml.XmlElement root = MyXML.DocumentElement;
+                System.Xml.XmlNode node = root.SelectSingleNode("/DistanceMatrixResponse/row/element/duration");
+                aux = node["value"].InnerText;
+                hours[i] = Convert.ToInt32(aux) / 3600;
+                minutes[i] = (Convert.ToInt32(aux) - 3600 * hours[i]) / 60;
+                totalduration = totalduration + Convert.ToInt32(aux);
+
+                System.Xml.XmlNode node2 = root.SelectSingleNode("/DistanceMatrixResponse/row/element/distance");
+                aux = node2["value"].InnerText;
+                distance[i] = Convert.ToInt32(aux) / 1000;
+                totaldistance = totaldistance + distance[i];
+                MyCounter = i + 1;
+            }
+        }
+        totalhours = totalduration / 3600;
+        totalminutes = (totalduration - totalhours * 3600) / 60;
+
+        //NEW
+        MyTripData.MyCounter = MyCounter;
+        MyTripData.TotalHours = totalhours;
+        MyTripData.TotalMinutes = totalminutes;
+        MyTripData.TotalKm = totaldistance;
+        for (int i = 0; i < counter - 1; i++)
+        {
+            MyTripData.HoursList.Add(hours.ElementAt(i));
+            MyTripData.MinutesList.Add(minutes.ElementAt(i));
+            MyTripData.DistanceList.Add(distance.ElementAt(i));
+        }
+        return MyTripData;
+    }
+
+
+    public struct TripData
+    {
+        public int MyCounter;
+        public int TotalHours;
+        public int TotalMinutes;
+        public double TotalKm;
+        public List<int> HoursList;
+        public List<int> MinutesList;
+        public List<double> DistanceList;
+    }
+
+    public int MyGlobalCounter = 0;
+}

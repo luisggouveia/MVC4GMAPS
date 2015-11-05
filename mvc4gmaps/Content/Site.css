@@ -1,0 +1,341 @@
+﻿body {
+    padding-top: 50px;
+    padding-bottom: 20px;
+}
+
+/* Set padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+/* styles for validation helpers */
+.field-validation-error {
+    color: #b94a48;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
+
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
+
+.validation-summary-errors {
+    color: #b94a48;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
+#green {
+    height:100px;
+    width:100px;
+    background-color:#FF0000;
+    border-radius:5px;
+    margin-bottom:5px;
+    background-color:#008800;
+}
+
+/*My buttons (without glow)*/
+
+.MyButton {
+    border: none;
+    background: url('/forms/up.png') no-repeat top left;
+    padding: 2px 8px;
+}
+.MyButton:hover {
+    border: none;
+    background: url('/forms/down.png') no-repeat top left;
+    padding: 2px 8px;
+}
+
+.form-wrapper input[type="submit"] {
+  display: block;
+  background: #aaa;
+  color: #aaa;
+  border: none;
+  padding: 10px 20px;
+  -moz-border-radius: 2px;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.button  {
+    border-radius: 5px;
+    background-color: #2765F5;
+    text-align: center;
+    color: #FFFFFF;
+    font-family: Verdana, Arial, Sans-Serif;
+    opacity: 0.5;
+    -webkit-font-smoothing: antialiased;
+}
+/*.button2 {
+    font: 100% helvetica, sans-serif;
+    text-align: center;
+    padding: 3em 1em;
+    background: url(http://cl.ly/I4Ic/pattern.png);
+    -webkit-font-smoothing: antialiased;
+}*/
+
+.button4 {
+    background:#536973;
+	background:-moz-linear-gradient(top,#536973 0%,#31444D 100%);
+	background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#536973),color-stop(100%,#31444D));
+	background:-webkit-linear-gradient(top,#536973 0%,#31444D 100%);
+	background:-o-linear-gradient(top,#536973 0%,#31444D 100%);
+	background:-ms-linear-gradient(top,#536973 0%,#31444D 100%);
+	background:linear-gradient(top,#536973 0%,#31444D 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#536973',endColorstr='#31444D',GradientType=0);
+	padding:5px 7px;
+	color:#fff;
+	font-family:'Helvetica Neue',sans-serif;
+	font-size:11px;/*17*/
+	border-radius:4px;
+    font-weight: bold;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
+	border:1px solid #293940;
+    -webkit-transition: border-radius 0.5s;
+    transition: border-radius 0.5s;
+}
+
+.button4:hover{
+   border-radius: 16px;
+   -moz-border-radius:16px;
+	-webkit-border-radius:16px;
+   -webkit-transition: border-radius 0.5s;
+   transition: border-radius 0.5s;
+}
+
+.button4:focus {
+   border-radius: 16px;
+   -moz-border-radius:16px;
+	-webkit-border-radius:16px;
+   -webkit-transition: border-radius 0.5s;
+   transition: border-radius 0.5s;
+   border: none !important;
+   border-color: transparent !important;
+   outline: 0 !important;
+}
+/*
+.button4:active {
+   border-radius: 16px;
+   -moz-border-radius:16px;
+	-webkit-border-radius:16px;
+   -webkit-transition: border-radius 0.5s;
+   transition: border-radius 0.5s;
+   border: none !important;
+   border-color: transparent !important;
+   outline: 0 !important;
+}*/
+
+/*button3*/
+.button3 {
+    background:#25A6E1;
+	background:-moz-linear-gradient(top,#25A6E1 0%,#188BC0 100%);
+	background:-webkit-gradient(linear,left top,left bottom,color-stop(0%,#25A6E1),color-stop(100%,#188BC0));
+	background:-webkit-linear-gradient(top,#25A6E1 0%,#188BC0 100%);
+	background:-o-linear-gradient(top,#25A6E1 0%,#188BC0 100%);
+	background:-ms-linear-gradient(top,#25A6E1 0%,#188BC0 100%);
+	background:linear-gradient(top,#25A6E1 0%,#188BC0 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#25A6E1',endColorstr='#188BC0',GradientType=0);
+	padding:8px 12px;
+	color:#fff;
+	font-family:'Helvetica',sans-serif;
+	font-size:12px;/*17*/
+	border-radius:4px;
+    font-weight: bold;
+	-moz-border-radius:4px;
+	-webkit-border-radius:4px;
+	border:1px solid #1A87B9;
+    -webkit-transition: border-radius 0.5s;
+    transition: border-radius 0.5s;
+}
+
+.button3:hover{
+   border-radius: 16px;
+   -moz-border-radius:16px;
+	-webkit-border-radius:16px;
+   -webkit-transition: border-radius 0.5s;
+   transition: border-radius 0.5s;
+}
+
+.button3:focus {
+   border-radius: 16px;
+   -moz-border-radius:16px;
+	-webkit-border-radius:16px;
+   -webkit-transition: border-radius 0.5s;
+   transition: border-radius 0.5s;
+   border: none !important;
+   border-color: transparent !important;
+   outline: 0 !important;
+}
+/*
+.button3:active {
+   border-radius: 16px;
+   -moz-border-radius:16px;
+	-webkit-border-radius:16px;
+   -webkit-transition: border-radius 0.5s;
+   transition: border-radius 0.5s;
+}
+    */
+
+/*My buttons (with glow)*/
+.MyContainer{
+    border-radius: 5px;
+    background-color: #2765F5;
+    text-align: center;
+    color: #FFFFFF;
+    font-family: Verdana, Arial, Sans-Serif;
+    opacity: 0.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.MyContainer:hover{
+    animation:gloww 1s ease;
+    -moz-animation:gloww 1s ease; /* Firefox */
+    -webkit-animation:gloww 1s ease; /* Safari and Chrome */
+    -o-animation:gloww 1s ease; /* Opera */
+}
+
+@keyframes gloww {
+    0% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+    50% {-moz-box-shadow: 0 0 5px 5px #888;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 5px 5px #B2FF54;}
+    100% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 0 0px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+}
+
+@-moz-keyframes gloww /* Firefox */ {
+    0% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+    50% {-moz-box-shadow: 0 0 5px 5px #888;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 5px 5px #B2FF54;}
+    100% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 0 0px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+}
+
+@-webkit-keyframes gloww /* Safari and Chrome */ {
+    0% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+    50% {-moz-box-shadow: 0 0 5px 5px #888;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 5px 5px #B2FF54;}
+    100% {-moz-box-shadow: 0 0 5px 5px #888;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 5px 5px #B2FF54;}
+}
+
+@-o-keyframes gloww /* Opera */ {
+    0% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+    50% {-moz-box-shadow: 0 0 5px 5px #888;
+    -webkit-box-shadow: 0 0 5px 5px#B2FF54;
+    box-shadow: 0 0 5px 5px #B2FF54;}
+    100% {-moz-box-shadow: 0 0 0 0 #B2FF54;
+    -webkit-box-shadow: 0 0 0 0px#B2FF54;
+    box-shadow: 0 0 0 0 #B2FF54;}
+}
+
+#MyDiv {
+    height: 50px;
+    width: 6.5%;
+    /*display: inline-block;*/
+    background-position: center center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: right;
+    display: inline-block;
+    vertical-align: middle;
+}
+       
+#MyDiv2 {
+    height: 50px;
+    width: 6.5%;
+    /*display: inline-block;*/
+    background-position: center center;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    display: inline-block;
+    vertical-align: middle;
+}
+.centeredImage {
+    text-align: center;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding: 0px;
+}
+
+#map_canvas img {
+    max-width: none;
+}
+
+.infoDiv {
+    height: 200px;
+    width: 300px;
+    -webkit-user-select: none;
+    background-color: white;
+}
+
+ .MyOrigin
+{
+    width:207px;
+} 
+.MyWaypoint
+{
+    width:178px;
+    margin-left : 5px;
+} 
+.MyDestination
+{
+    width:178px;
+} 
+
+.TotalWidth
+{
+    width:254px;
+}
+
+.PartialWidth
+{
+    width:103px;
+}
+
+.PartialWidth2
+{
+    width:147px;
+}
+
+.PartialWidth3
+{
+    width:125px;
+}
+
+.FixedSizeClass
+{
+    height: 80px;
+}

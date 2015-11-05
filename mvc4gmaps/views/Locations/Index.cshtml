@@ -1,0 +1,380 @@
+﻿@model IEnumerable<MVC4GMAPS.Models.Location>
+
+@{
+    ViewBag.Title = "Locations";
+}
+
+<h2>Locations</h2>
+
+<meta charset="utf-8">
+<title>jQuery UI Autocomplete - Default functionality</title>
+
+<script src="https://code.jquery.com/jquery-1.9.1.js"></script>
+<script type ="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false"></script>
+<link rel="stylesheet" href="/resources/demos/style.css">
+<link rel="stylesheet" type="text/css" href="~/content/Site.css">
+
+<script>
+    $(function () {
+        //PREVENT SUBMIT ON ENTER (FROM HERE)
+        $(window).keydown(function (event) {
+            if (event.keyCode == 13) {
+                event.preventDefault();
+                return false;
+            }
+        });
+        //TO HERE
+
+        //$("#Origin").jeoCityAutoComplete();
+        //$("#Destination").jeoCityAutoComplete();
+        //JeoQuery Replaced from here
+        var input1 = document.getElementById('Origin');
+        var input2 = document.getElementById('Destination');
+        var options = {
+            types: ['(cities)']
+        };
+        var autocomplete1 = new google.maps.places.Autocomplete(input1, options);
+        var autocomplete2 = new google.maps.places.Autocomplete(input2, options);
+        //TO HERE
+
+        var answers = 0,
+        write = document.getElementById('buttons');
+        var counter = 1;
+ 
+        $("#addButton").click(function () {
+            if(counter>9){
+                alert("Only 9 waypoints allowed");
+                return false;
+            }
+ 
+            var newTextBoxDiv = $(document.createElement('div')).attr("id", 'TextBoxDiv' + counter);
+            newTextBoxDiv.after().html('<div style=\'display: inline-block;width:71px;font-family: Arial;font-size:12px;font-weight:bold;\'>Waypoint ' + counter + ':</div>' + '<input type="text" name="Waypoint' + counter + '" class="MyWaypoint" placeholder="Insert waypoint here" id="Waypoint' + counter + '" value="">');
+
+            newTextBoxDiv.appendTo("#TextBoxesGroup");
+            //$("#Waypoint" + counter).jeoCityAutoComplete();
+            //JeoQuery Replaced from here
+            var MyString = "Waypoint" + counter.toString();
+            var input3 = document.getElementById(MyString);
+            var options = {
+                types: ['(cities)']
+            };
+            var autocomplete3 = new google.maps.places.Autocomplete(input3, options);
+            //TO HERE
+            counter++;
+        });
+ 
+        $("#removeButton").click(function () {
+            if(counter==1){
+                alert("No more Waypoints to remove");
+                return false;
+            }   
+            counter--;
+            $("#TextBoxDiv" + counter).remove();
+        });
+ 
+        $("#getButtonValue").click(function () {
+            var msg = '';
+            for (i = 1; i < counter; i++) {
+                msg += "\nWaypoint " + i + ": " + $('#Waypoint' + i).val();
+            }
+            alert(msg);
+        });
+
+        $('.nav-toggle').click(function () {
+            //get collapse content selector
+            var collapse_content_selector = $(this).attr('href');
+
+            //make the collapse content to be shown or hide
+            var toggle_switch = $(this);
+            $(collapse_content_selector).toggle(function () {
+                if ($(this).css('display') == 'none') {
+                    //change the button label to be 'Show'
+                    if (collapse_content_selector == "#collapse1") {
+                        toggle_switch.html('SHOW DATABASE');
+                    }
+                    if (collapse_content_selector == "#collapse2") {
+                        toggle_switch.html('SHOW DATABASE');
+                    }
+                }
+                else {
+                    //change the button label to be 'Hide'
+                    if (collapse_content_selector == "#collapse1") {
+                        toggle_switch.html('HIDE DATABASE');
+                    }
+                    if (collapse_content_selector == "#collapse2") {
+                        toggle_switch.html('HIDE DATABASE');
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+
+
+<span id="rData"></span>
+
+
+<p>
+    @using (Html.BeginForm())
+    {
+    <p>
+      
+        <!--<strong>Origin:</strong> ATHtml.TextBox("Origin")-->
+
+        <div style="display: inline-block; width: 43px; font-family: Arial; font-size: 12px; font-weight: bold;">Origin:</div> @Html.TextBox("Origin", "", new { @class = "MyOrigin", @placeholder = "Insert origin here"}) 
+        <p></p>
+        
+        <div id='TextBoxesGroup'>
+            <input type='button' class="button4 PartialWidth3" value='NEW WAYPOINT' id='addButton'>
+            <input type='button' class="button4 PartialWidth3" value='REMOVE WAYPOINT' id='removeButton'>
+            <p></p>
+        </div>
+        <p></p>        
+        <!--<strong>Destination:</strong> ATHtml.TextBox("Destination")-->
+        <div style="display: inline-block; width: 72px; font-family: Arial; font-size: 12px; font-weight: bold;">Destination:</div> @Html.TextBox("Destination", "", new { @class = "MyDestination", @placeholder = "Insert destination here" })
+        <p></p>                                      
+        
+        @if (User.Identity.IsAuthenticated)
+        {
+            <input type="submit" class="button3 PartialWidth" name="Command" value="SAVE TRIP" />
+            <input type="submit" class="button3 PartialWidth2" name="Command" value="SAVE&SHOW TRIP" />
+        }
+        else
+        {
+            <input type="submit" class="button3 TotalWidth" name="Command" value="SAVE&SHOW TRIP" />
+        }
+    </p>
+    }
+</p>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <button href="#collapse1" class="nav-toggle button3 TotalWidth">SHOW DATABASE</button>
+}
+else
+{
+    <h5>Please register to create <strong>your own</strong> trip database & <strong>unlock</strong> more options</h5>
+}
+<!--
+else
+{
+    <button href="#collapse2" class="nav-toggle button3">SHOW PUBLIC DATABASE</button>
+}
+    -->
+<p></p>
+
+<div id="collapse1" style="display:none">
+    @using (Html.BeginForm())
+    {
+        <input type="submit" class="button3 PartialWidth" name="Command" value="SHOW ALL" />
+        <input type="submit" class="button3 PartialWidth2" name="Command" value="SHOW TRIP NUM:" /> @Html.TextBox("trip")  <br />
+        <p></p>
+        int MyCount=0;
+        int Index=0;
+        foreach (var i in Model)
+        {
+            if (i.UserName == User.Identity.Name)
+            {
+                Index = MyCount;
+            }
+            MyCount++;
+        }
+        if (Model.ElementAt(Index).LoginProvider=="Facebook")
+        {
+            <input type="submit" class="button3 PartialWidth" name="Command" value="POST ALL" /> //LGMG 3/3/14
+            <input type="submit" class="button3 PartialWidth2" name="Command" value="POST TRIP NUM:" /> @Html.TextBox("trip")  <br /> //LGMG 3/3/14
+        }
+    }
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Country)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.State) <!--LGMG_DB_MODIF_14_02_25-->
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.City)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lon)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Trip)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                @if (HttpContext.Current.User.Identity.IsAuthenticated == true)
+                {
+                    if (item.UserName == HttpContext.Current.User.Identity.Name)
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Country)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.State) <!--LGMG_DB_MODIF_14_02_25-->
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.City)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Lat)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Lon)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Trip)
+                        </td>
+                        <td><!--
+                            ATHtml.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                            ATHtml.ActionLink("Details", "Details", new { id = item.ID }) |
+                            -->@Html.ActionLink("Delete", "Delete", new { id = item.ID })
+                        </td>
+                    }
+                }
+                else if (item.UserName == null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Country)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.State) <!--LGMG_DB_MODIF_14_02_25-->
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.City)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lat)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lon)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Trip)
+                    </td>
+                    <td><!--
+                            ATHtml.ActionLink("Edit", "Edit", new { id = item.ID }) |
+                            ATHtml.ActionLink("Details", "Details", new { id = item.ID }) |
+                            -->@Html.ActionLink("Delete", "Delete", new { id = item.ID })
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+
+
+
+<!--
+<div id="collapse2" style="display:none">
+    @using (Html.BeginForm())
+    {
+        <input type="submit" class="button3" name="Command" value="SHOW ALL" />
+        <input type="submit" class="button3" name="Command" value="SHOW TRIP NUM:" /> @Html.TextBox("trip")  <br />
+        
+        if (Model.ElementAt(0).LoginProvider=="Facebook")
+        {
+            <input type="submit" class="button3 PartialWidth" name="Command" value="POST ALL ON FACEBOOK" /> //LGMG 3/3/14
+            <input type="submit" class="button3 PartialWidth2" name="Command" value="POST TRIP NUM:" /> @Html.TextBox("trip")  <br /> //LGMG 3/3/14
+        }
+    }
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Country)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.State) 
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.City)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lon)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Trip)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                @if (HttpContext.Current.User.Identity.IsAuthenticated == true)
+                {
+                    if (item.UserName == HttpContext.Current.User.Identity.Name)
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Country)
+                        </td>
+                        <th>
+                             @Html.DisplayNameFor(model => model.State) 
+                        </th>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.City)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Lat)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Lon)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Trip)
+                        </td>
+                        <td>@Html.ActionLink("Delete", "Delete", new { id = item.ID })  
+                        </td>
+                    }
+                }
+                else if (item.UserName == null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Country)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.State) 
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.City)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lat)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Lon)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Trip)
+                    </td>
+                    <td>@Html.ActionLink("Delete", "Delete", new { id = item.ID }) 
+                    </td>
+                }
+            </tr>
+        }
+    </table>
+</div>
+-->
+
+@{
+    if (Model.ElementAt(0).Village != null)
+    {
+        <p></p>
+        <h4> Your link to post on Facebook (the next version will automatically post on your wall): <a href="@Model.ElementAt(0).Village"><p></p>@Model.ElementAt(0).Village</a></h4>
+
+    }
+}
